@@ -7,7 +7,13 @@ const {
   createRaffle,
 } = require("../queries/rafflesQueries");
 
-const { validateId, validateRaffle } = require("../middleware/index");
+const { getParticipantsByRaffleId } = require("../queries/participantsQueries");
+
+const {
+  validateId,
+  validateRaffle,
+  validateRaffleExists,
+} = require("../middleware/index");
 
 router.get("/", async (req, res) => {
   try {
@@ -18,18 +24,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", validateId, async (req, res) => {
+router.get("/:id", validateId, validateRaffleExists, async (req, res) => {
   try {
-    const { id } = req.params;
-    const raffle = await getRaffleById(Number(id));
-
-    if (raffle) {
-      res.status(200).json({ data: raffle });
-    } else {
-      return res
-        .status(404)
-        .json({ error: `Could not find raffle with id: ${id}!` });
-    }
+    const { raffle } = req;
+    res.status(200).json({ data: raffle });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -43,5 +41,20 @@ router.post("/", validateRaffle, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+router.get(
+  "/:id/participants",
+  validateId,
+  validateRaffleExists,
+  async (req, res) => {
+    try {
+      const { id } = req;
+      const participants = await getParticipantsByRaffleId(id);
+      res.status(200).json({ data: participants });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
 
 module.exports = router;
