@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { getAllRaffles, getRaffleById } = require("../queries/rafflesQueries");
+const {
+  getAllRaffles,
+  getRaffleById,
+  createRaffle,
+} = require("../queries/rafflesQueries");
 
-const validateId = require("../middleware/index");
+const { validateId, validateRaffle } = require("../middleware/index");
 
 router.get("/", async (req, res) => {
   try {
@@ -26,6 +30,15 @@ router.get("/:id", validateId, async (req, res) => {
         .status(404)
         .json({ error: `Could not find raffle with id: ${id}!` });
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/", validateRaffle, async (req, res) => {
+  try {
+    const createdRaffle = await createRaffle(req.body);
+    res.status(201).json({ data: createdRaffle });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
