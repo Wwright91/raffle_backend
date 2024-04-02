@@ -12,9 +12,9 @@ CREATE TABLE raffles (
 
 CREATE TABLE participants (
   id SERIAL PRIMARY KEY,
-  first_name varchar(255),
-  last_name varchar(255),
-  email varchar(255) UNIQUE,
+  first_name varchar(255) NOT NULL,
+  last_name varchar(255) NOT NULL,
+  email varchar(255) UNIQUE NOT NULL,
   phone varchar(255),
   raffle_id integer REFERENCES raffles(id) ON DELETE CASCADE
 );

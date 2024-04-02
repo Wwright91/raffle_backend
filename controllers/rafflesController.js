@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getAllRaffles,
-  getRaffleById,
-  createRaffle,
-} = require("../queries/rafflesQueries");
+const { getAllRaffles, createRaffle } = require("../queries/rafflesQueries");
 
-const { getParticipantsByRaffleId } = require("../queries/participantsQueries");
+const {
+  getParticipantsByRaffleId,
+  signUpParticipant,
+} = require("../queries/participantsQueries");
 
 const {
   validateId,
   validateRaffle,
   validateRaffleExists,
+  validateParticipant,
 } = require("../middleware/index");
 
 router.get("/", async (req, res) => {
@@ -51,6 +51,22 @@ router.get(
       const { id } = req;
       const participants = await getParticipantsByRaffleId(id);
       res.status(200).json({ data: participants });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
+
+router.post(
+  "/:id/participants",
+  validateId,
+  validateRaffleExists,
+  validateParticipant,
+  async (req, res) => {
+    try {
+      const { id } = req;
+      const newParticipant = await signUpParticipant(req.body, id);
+      res.status(201).json({ data: newParticipant });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

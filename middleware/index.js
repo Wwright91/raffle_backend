@@ -54,4 +54,39 @@ const validateRaffleExists = async (req, res, next) => {
   next();
 };
 
-module.exports = { validateId, validateRaffle, validateRaffleExists };
+const PARTICIPANT_FIELDS = ["first_name", "last_name", "email"];
+
+const validateParticipant = (req, res, next) => {
+  const participant = req.body;
+
+  for (const field of PARTICIPANT_FIELDS) {
+    if (!participant.hasOwnProperty(field)) {
+      return res.status(400).json({
+        error: `Field '${field}' is missing`,
+      });
+    }
+    if (typeof participant[field] !== "string") {
+      return res.status(400).json({
+        error: `Field '${field}' must be a string, received: a ${typeof participant[
+          field
+        ]}, ${participant[field]}`,
+      });
+    }
+  }
+
+  for (const field in participant) {
+    if (!PARTICIPANT_FIELDS.includes(field) && field !== "phone") {
+      return res
+        .status(400)
+        .json({ error: `${field} field not allowed for participant` });
+    }
+  }
+  next();
+};
+
+module.exports = {
+  validateId,
+  validateRaffle,
+  validateRaffleExists,
+  validateParticipant,
+};
