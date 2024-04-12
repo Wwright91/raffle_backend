@@ -4,8 +4,8 @@ const getParticipantsByRaffleId = async (raffleId) => {
   const participants = await db.any(
     `
   SELECT *
-  FROM participants
-  JOIN raffles
+  FROM raffles
+  JOIN participants
   ON participants.raffle_id = raffles.id
   WHERE raffle_id = $1;
   `,
