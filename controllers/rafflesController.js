@@ -119,12 +119,7 @@ router.get(
   async (req, res) => {
     try {
       const { id } = req;
-      const raffle = req.raffle;
-      if (raffle.winner_id === null) {
-        return res
-          .status(401)
-          .json({ error: `Raffle ${id} has not been raffled yet!` });
-      }
+
       const winner = await getWinnerByRaffleId(id);
       res.status(200).json({ data: winner });
     } catch (err) {

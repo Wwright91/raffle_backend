@@ -26,14 +26,6 @@ const pickWinnerByRaffleId = async (raffleId) => {
 };
 
 const getWinnerByRaffleId = async (raffleId) => {
-  const participants = await getParticipantsByRaffleId(raffleId);
-
-  if (!participants.length) {
-    throw new Error(
-      `No participants found for the raffle with id: ${raffleId}`
-    );
-  }
-
   const winner = await db.oneOrNone(
     `
     SELECT *
