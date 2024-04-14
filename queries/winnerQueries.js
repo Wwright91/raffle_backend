@@ -25,4 +25,28 @@ const pickWinnerByRaffleId = async (raffleId) => {
   return winner;
 };
 
-module.exports = { pickWinnerByRaffleId };
+const getWinnerByRaffleId = async (raffleId) => {
+  const participants = await getParticipantsByRaffleId(raffleId);
+
+  if (!participants.length) {
+    throw new Error(
+      `No participants found for the raffle with id: ${raffleId}`
+    );
+  }
+
+  const winner = await db.oneOrNone(
+    `
+    SELECT *
+    FROM raffles
+    JOIN participants
+    ON participants.raffle_id = raffles.id
+    AND participants.id = raffles.winner_id
+    WHERE raffle_id = $1;
+    `,
+    [raffleId]
+  );
+
+  return winner;
+};
+
+module.exports = { pickWinnerByRaffleId, getWinnerByRaffleId };

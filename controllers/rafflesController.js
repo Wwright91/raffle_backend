@@ -8,7 +8,10 @@ const {
   signUpParticipant,
 } = require("../queries/participantsQueries");
 
-const { pickWinnerByRaffleId } = require("../queries/winnerQueries");
+const {
+  pickWinnerByRaffleId,
+  getWinnerByRaffleId,
+} = require("../queries/winnerQueries");
 
 const {
   validateId,
@@ -102,6 +105,27 @@ router.put(
       }
 
       const winner = await pickWinnerByRaffleId(id);
+      res.status(200).json({ data: winner });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
+
+router.get(
+  "/:id/winner",
+  validateId,
+  validateRaffleExists,
+  async (req, res) => {
+    try {
+      const { id } = req;
+      const raffle = req.raffle;
+      if (raffle.winner_id === null) {
+        return res
+          .status(401)
+          .json({ error: `Raffle ${id} has not been raffled yet!` });
+      }
+      const winner = await getWinnerByRaffleId(id);
       res.status(200).json({ data: winner });
     } catch (err) {
       res.status(500).json({ error: err.message });
